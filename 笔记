@@ -1,0 +1,66 @@
+1.Msite的页面（第一屏）
+ swiper是第三方插件，下载后直接引入即可    node_modules ---> swiper--->dist--->css-->swipter
+   swiper没有显示，因为没有引入swiper---->下载--》引入
+   import Swiper from 'swiper'
+     import 'swiper/dist/css/swiper.min.css'
+    new Swiper('.swiper-container', {
+           loop: true,  // 循环轮播
+           // 如果需要分页器
+           pagination: {
+             el: '.swiper-pagination',
+           }
+         })
+    在页面渲染完以后，设置轮播
+2.把Order;Profile和Search;Msite组件html内容及stylus样式加入以后
+  以上四个组件头部导航样式相同,可以设置一个组件HeadTop组件，把共同的样式抽取出来(为静态组件，放入components中
+  使用slot进行组件间的通信------》标签传递
+  HeadTop组件为通用的,放在全局里注册（在main.js注册） 引入--->注册 Vue.component('HeadTop',HeadTop);
+
+
+操作：一、测试:1)分析组件，先设文件夹;
+            2)先设几个普通的文字，如App实现页面的初步显示;
+            3)设置底部导航-->路由组件，引入样式，实现初步页面跳转;
+              a)设置路由对象(路由组件)--》{所有组件都在这里设置}-->注册路由-》配置路由器(在main.js中);
+    二、第一屏:
+         轮播图：下载第三方插件swiper-->引入-->创建对象（引入配置对象）-->可查看文档
+              注意:轮播图的轮播显示要放在mounted中，此时页面渲染完成
+         头部必须抽取出来 ---》头部导航HeadTop通用组件的设置,在多处使用,
+             放在全局里注册（在main.js注册） 引入--->注册 Vue.component('HeadTop',HeadTop);
+
+         使用slot进行组件间的通信------》标签传递
+            为子组件:基本构造--》无需涵盖过多内容，仅变化的内容需要写入，如title
+             使用此组件的
+          为其父组件,与子组件进行通信,内容在此处解析，解析后传递给子组件
+
+    Msite组件的商家列表可以抽取出来，也可以不抽取出来
+        其为本页面单独使用，不是路由组件，为普通组件
+        ShopList.vue为组件Msite组件的子组件,设置好内容以后要
+        引入父组件中：模板中写入组件;script中引入;new Vue中映射组件
+三、第四屏
+    点击登录注册后跳转，跳转至Lodin组件（为路由组件）
+    有两种方法跳转：1是route-link;另一种是编程式路由导航js
+    法一:只需在点击内容外侧包裹<router-link to = "/login"></router-link>即可
+    法二:
+Login组件（路由组件）---->配置，注册--->html文件书写--->静态功能实现
+四、底部导航区在四大组件时显示,转换至其他组件时隐藏
+    查看路由文档:路由元信息
+   查看vue工具,meta:{requireAuth:true};
+   配置路由时可以配置meta，指定标识属性（标识底部导航）,来确定需不需要此属性,值的类型为对象；
+
+
+ 五、与后台交互  ajax
+ 把硅谷外卖的项目api文件里内容拉进postman里,可以查看集合
+ postman 可以测试接口--》发送是否成功
+ 启动服务器
+   发送ajax请求
+   1.下载axios的依赖
+     封装ajax请求函数
+   2.index.js 含有n个请求函数
+   3.测试ajax请求，在App中进行
+ 六、发送ajax请求，引入Vuex
+   store(-->index.js)核心库管理：有四个部分+mutation-types
+    actions;state;mutations;getters
+七、title动态切换
+
+
+
