@@ -1,39 +1,48 @@
+
 <template>
   <section class="loginContainer">
     <div class="loginInner">
       <div class="login_header">
         <h2 class="login_logo">硅谷外卖</h2>
         <div class="login_header_title">
-          <a href="javascript:;" class="on">短信登录</a>
-          <a href="javascript:;" class="">密码登录</a>
+          <a href="javascript:;" :class="{on:!loginWay}" @click="loginWay=false">短信登录</a>
+          <a href="javascript:;" :class="{on:loginWay}" @click="loginWay=true">密码登录</a>
         </div>
       </div>
       <div class="login_content">
         <form>
-          <div class="on">
+          <div :class="{on:!loginWay}" >
             <section class="login_message">
-              <input type="tel" maxlength="11" placeholder="手机号">
-              <button disabled="disabled" class="get_verification">获取验证码</button>
+              <input type="tel" maxlength="11" placeholder="手机号" v-model="phone">
+              <button :disabled="!isRightPhone || computeTime>0" class="get_verification" @click.prevent="sendCode" :class="{right_phone_number:isRightPhone}">{{computeTime>0?`已发送(${computeTime}s)`:'获取验证码'}}</button>
             </section>
             <section class="login_verification">
               <input type="tel" maxlength="8" placeholder="验证码">
+
             </section>
             <section class="login_hint">
               温馨提示：未注册硅谷外卖帐号的手机号，登录时将自动注册，且代表已同意
               <a href="javascript:;">《用户服务协议》</a>
             </section>
           </div>
-          <div class="">
+          <div :class="{on:loginWay}">
             <section>
               <section class="login_message">
                 <input type="tel" maxlength="11" placeholder="手机/邮箱/用户名">
+
               </section>
               <section class="login_verification">
-                <input type="tel" maxlength="8" placeholder="密码">
-                <div class="switch_button off">
-                  <div class="switch_circle"></div>
-                  <span class="switch_text">...</span>
+                <input :type="isShowPwd?'text':'password'  "maxlength="8" placeholder="密码">
+
+                <div class="switch_button" :class="isShowPwd?'on':'off'"  @click="isShowPwd=!isShowPwd">
+                  <div class="switch_circle" :class="{right:isShowPwd}"></div>
+                  <span class="switch_text">{{isShowPwd?'abc':''}}</span>
                 </div>
+              </section>
+              <section class="login_message">
+                <input type="text" maxlength="11" placeholder="验证码">
+                <img class="get_verification" @click="updateCaptcha" src="http://localhost:4000/captcha" alt="captcha"
+                    >
               </section>
             </section>
           </div>
@@ -51,10 +60,61 @@
   </section>
 </template>
 <script>
+  /*加入的类名样式定义*/
   export default {
     data() {
-      return {}
-    }
+      return {
+        /*false代短信，true代密码*/
+        loginWay:false,
+        phone:'',
+        code:'',
+        name:'',
+        pwd:'',
+        computeTime:0,
+        captcha:'',
+        isShowPwd:false    //是否显示密码（当前组件使用）
+      }
+    },
+    computed:{
+       isRightPhone(){
+         return /^1\d{10}$/.test(this.phone)   //正则匹配
+       }
+    },
+    methods:{
+      async sendCode(){
+        this.computeTime=30
+        //循环定时器，每秒减一   启动定时器时确定
+        const interverId = setInterval(()=>{
+          if(this.computeTime<=0){
+            //停下来
+            this.computeTime=0;
+            clearInterval(interverId)
+          }
+          this.computeTime--
+        },1000)
+        /*2. 发送请求去发短信验证码*/
+        const result = await reqSendCode(this.phone)
+        if(result.code===0) { // 成功
+          Toast('验证码已发送')
+        } else { // 失败
+          // 停止计时
+          this.computeTime = 0
+          // alert('失败了')
+          MessageBox.alert('验证码发送失败', '提示')
+        }
+      },
+
+      /*1)无需开启定时器:a.未输入正确手机号;b.正在计时
+      可在以上模板中限制
+      * 2)负值*/
+      },//发送一次性短信验证码
+
+      /*给img标签指定src;ref和target都可以*/
+      updateCaptcha(event){
+        //每次请求都不一样，浏览器自动发请求获取新的图片
+        event.target.src = 'http://localhost:4000/captcha?time=' + Date.now()
+      }//更新显示一次性验证码
+
   }
 </script>
 <style lang="stylus" rel="stylesheet/stylus">
@@ -119,6 +179,8 @@
                 color #ccc
                 font-size 14px
                 background transparent
+                &.right_phone_number
+                  color black
             .login_verification
               position relative
               margin-top 16px
@@ -158,6 +220,8 @@
                   background #fff
                   box-shadow 0 2px 4px 0 rgba(0,0,0,.1)
                   transition transform .3s
+                  &.right
+                    transform translateX(27px)
             .login_hint
               margin-top 12px
               color #999

@@ -6,8 +6,14 @@
 与后台交互模块
  */
 import ajax from './ajax'
-export const reqAddress = geohash => ajax('/api/position/' + geohash)
-export const reqCategories = () => ajax('/api/index_category')
-export const reqShops = ({latitude, longitude}) => ajax('/api/shops', {latitude, longitude})
 
+const BASE = '/api'
 
+// [1、根据经纬度获取位置详情](#1根据经纬度获取位置详情)<br/>
+export const reqAddress = (geohash) => ajax(`${BASE}/position/${geohash}`)
+
+// 2、获取食品分类列表
+export const reqCategories = () => ajax(BASE+'/index_category')
+
+// 3. 根据经纬度获取商铺列表
+export const reqShops = (longitude, latitude) => ajax(BASE+'/shops', {latitude, longitude})

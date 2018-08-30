@@ -8,17 +8,15 @@
       <a class="header_login" slot="right">
         <span class="header_login_text">登录|注册</span>
       </a>
+
     </HeadTop>
     <!--首页导航-->
     <nav class="msite_nav">
-      <!--数组长度大于0时显示-->
       <div class="swiper-container" v-if="categories.length">
         <div class="swiper-wrapper">
-          <!--得到数组-->
-          <div class="swiper-slide" v-for="(categories,index) in categoriesArr" :key="index">
-            <a href="javascript:" class="link_to_food"  v-for="(c,index) in categories" :key="index">
-              <!-- 得到数组内元素-->
-              <div class="food_container" >
+          <div class="swiper-slide" v-for="(categories, index) in categoriesArr" :key="index">
+            <a href="javascript:" class="link_to_food" v-for="(c, index) in categories" :key="index">
+              <div class="food_container">
                 <img :src="baseImgUrl+c.image_url">
               </div>
               <span>{{c.title}}</span>
@@ -233,39 +231,26 @@
   import {mapState} from 'vuex'
   /*已经下载包，从哪里拿到*/
   export default {
-    data() {
+    data () {
       return {
-        baseImgUrl:'https://fuss10.elemecdn.com'
+        baseImgUrl: 'https://fuss10.elemecdn.com'
       }
     },
-    mounted() {
-
-      this.$store.dispatch('getAddress')
-      this.$store.dispatch('getCategories')
-      this.$store.dispatch('getShops');
+    mounted(){
+      new Swiper('.swiper-container', {
+        loop: true,  // 循环轮播
+        // 如果需要分页器
+        pagination: {
+          el: '.swiper-pagination',
+        },
+      })
+        this.$store.dispatch('getAddress')
+        this.$store.dispatch('getCategories')
     },
-
-    computed: {
-      ...mapState(['address', 'categories']),
-      categoriesArr() {
-        const {categories} = this;  //this指的是组件，解构赋值
-        const max = 8;      //小数组最大长度为8
-        const bigArr = [];     //建立空的大数组
-        let smallArr = [];   //建立空的小数组
-        categories.forEach(c => {
-          if (smallArr.length === 0) {
-            bigArr.push(smallArr)
-          }
-          smallArr.push(c);
-
-          //如果已满，创建一个小数组
-          if(smallArr.length===max) {
-            smallArr = []
-          }
-        })
-        return bigArr           //关联大数组和小数组
-      }
-      /*categoriesArr () {
+    computed:{
+      ...mapState(['address','categories']),
+      // 轮播需要的二维数组
+      categoriesArr () {
         const {categories} = this
         console.log(this)            //this 是组件
         const max = 8  // 小数组中元素的最大长度
@@ -284,14 +269,14 @@
           }
         })
         return bigArr
-      }*/
+      }
     },
-    components: {
-      ShopList
-    },
-    watch:{
-      categories(){//获取列表数据
-        this.$nextTick(()=>{
+    // 注意: 状态变化后, 界面才异步执行更新, watch的回调是同步执行
+    watch: {
+      categories () { // 获得了categories列表数据了
+        // 将回调延迟到下次 DOM 更新循环之后执行。在修改数据之后立即使用它
+        this.$nextTick(() => {
+          // 必须在列表界面显示后才创建(列表数据显示后)
           new Swiper('.swiper-container', {
             loop: true,  // 循环轮播
             // 如果需要分页器
@@ -301,10 +286,25 @@
           })
         })
       }
-    }
+
+    },
+    components:{
+      ShopList
+    },
+   /* mounted () {
+      // 分发给action发ajax获取address数据
+      this.$store.dispatch('getAddress')
+    },*/
+
+
   }
-
-
+  /*new Swiper('.swiper-container', {
+    loop: true,  // 循环轮播
+    // 如果需要分页器
+    pagination: {
+      el: '.swiper-pagination',
+    },
+  })*/
 </script>
 <style lang="stylus" rel="stylesheet/stylus">
   @import "../../common/stylus/mixins.styl"

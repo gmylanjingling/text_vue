@@ -13,10 +13,10 @@
   FootGuide,
   },
     /*发送请求*/
-    mounted () {
+    /*mounted () {
       // 分发给action发ajax获取address数据
       this.$store.dispatch('getAddress')
-    },
+    },*/
 
     /*async mounted(){
     const result=await reqAddress('41.2008,116.36767')
